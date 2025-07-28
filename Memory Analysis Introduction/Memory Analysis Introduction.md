@@ -6,16 +6,20 @@
 
 ##### Table of contents:
 
+
 - [Volatile Memory](#volatile-memory)
 - [RAM Structure (Rootkits)](#ram-structure)
 - [RAM for Forensic Analysts](#ram-for-forensice-analysts)
 - [Memory Dumps](#memory-dumps)
+- [Memory-based Threat indicators](#memory-based-threat-indicators)
 - [Memory Manipulation in Practice (My hacking using this knowledge)](#memory-manipulation-in-practice)
+- [Rootkits](#rootkits)
 
 ##### Resources:
 
 - [THM Link](https://tryhackme.com/room/memoryanalysisintroduction)
 - [Rootkit](https://www.fortinet.com/uk/resources/cyberglossary/rootkit)
+- [Practial](https://www.youtube.com/watch?v=EqGoGwVCVwM)
 
 ##### Acronym dictionary:
 
@@ -70,7 +74,7 @@ The concept of Virtual Memory (VM), on the other hand, is a virtual memory space
 
 This means that the system can handle more active processes than the RAM alone can support. This allows processes to run as if they have dedicated memory whilst the system manages where the actual data resides. The OS continuously shifts data between RAM and disk depending on the system load and priority.
 
-**Simply, this impacts memory analysis because some forensic artefacts may reside in RAM whilst others may be temporarily stored in the swap files.**
+**Simply, this impacts MA because some forensic artefacts may reside in RAM whilst others may be temporarily stored in the swap files.**
 
 <img src="/imgs/swap.png" alt="alt text" width="400" />
 
@@ -119,7 +123,7 @@ This makes memory a priority to target during incident response, particularly wh
 
 MF is often used early in an investigation to capture data that disappears on shutdown. It helps responders collect active processes, network connections and other live artefacts before losing them.
 
-It is very useful when dealing with in-memory threats, fileless malware or credential theft. Memory analysis provides a snapshot of system activity that can help during an investigation.
+It is very useful when dealing with in-memory threats, fileless malware or credential theft. MA provides a snapshot of system activity that can help during an investigation.
 
 ##### [Back To Top](#memory-analysis-introduction)
 
@@ -174,6 +178,81 @@ Lastly, there are encryption and obfuscation techniques which also are used to m
 
 ## Memory-based Threat indicators
 
+
+MA is especially powerful for detecting threats that may not leave traces on a disk. While logs and file systems offer long-term evidence, memory reveals what is happening right now, making it an essetional part for identifying active or recently exectued attacks.
+
+The most common artifcats that analysts look for in memory can include the following:
+
+* Suspicous or malicous processes that are running without a crrosponding file on disk (The Practial in resources has an example of this)
+* DDL Injection, which is malicious code that is injected into the memory space of a legitimate process (hidden).
+* Process hollowing which is a technique where the memory of a trusted process is replaced with malicious code
+* API hooking, used to intercept or alter normal function calls to hide activity or manipuate system behvaior 
+* [RootKits](#rootkits), espically those operating in kernal space, which manipulate memory strucutres to hide files, processes, or network connections 
+
+
+These techniques can often leave specific memoyr signatures, like unusual memory regions, non-matching PE headers, or code execution in writable memory areas which can be detected with forensic tools. 
+
+Some of the most common attacks that can be found while pefroming a MA:
+
+
+#### Credential Access (MITRE ATT&CK: T1003)
+> T1071 – Application Layer Protocol: Command and Control
+
+Modern malware often communiats with external servers without dropping files (for example spyware). This fileless malware uses memory-resident payloads to fetch commands or exfiltrate data through standard protocols like HTTP, HTTPS or DNS. In memory, analyssts can find decrpted C2 Configs, IP Addresses or becaons that are not logged anywhere else to try find artifacts. 
+
+#### In-Memory Script Execution (T1086)
+> T1086 – PowerShell
+
+Scripts exectued from memory are harder to trace becoause they dont touch the disk. Attackers use powershell or other interperts (python, WMI) to execture code in RAM. MA may reveal full script contents, encoded commands, or runtime artifacts in the powershell process memory. 
+
+#### Persistence Techniques in Memory
+These persistence mechanisms can be identified by spotting related artifacts during a live memory analysis:
+
+> T1053.005 – Scheduled Task/Job: Scheduled Task
+
+Task schedualr creates jobs that execute at intervals or startup. During a MA, we can look for processes like **schtasks.exe** and memory strings that contain task names or malicious payload paths.
+
+> T1543.003 – Create or Modify System Process: Windows Service
+
+Malicious services may run in the background under **services.exe**. We may find unusal servcice names, binaries or configs in memory that can relate to this technique.
+
+> T1547.001 – Registry Run Keys / Startup Folder
+
+Malware adds entires **HKCU\Software\Microsoft\Windows\CurrentVersion\Run** to executre on boot. These values can often be recovered from memory or found within registery hives cached in RAM.
+
+### Lateral Movement via Memory Artifacts
+
+Memory forensics can also expose attempts at lateral movement across systems. Common techniques can include:
+
+> T1021.002 – Remote Services: SMB/Windows Admin Shares (PsExec)
+
+**PsExec** enables command execution on remote systems. Analysts might find **PsExec-related** services or command-line arguments in memoyr indicating lateral movement.
+
+> T1021.006 – Remote Services: Windows Remote Management (WinRM) 
+
+WinRM Provides powershell remoting. Look for **wsmprovhost.exe** and memory references to remote session initalization. 
+
+> T1059.001 – Command and Scripting Interpreter: PowerShell (Remote)
+
+Powershell is commonly used for remote command exection. Analysts can detect base64-encoded or obfuscated commands within memory of the powershell processes.
+
+> T1047 – Windows Management Instrumentation (WMI)
+
+WMI commands like wmic process call create may be used to spawn remote processes. Associated command strings or class refrences may be cached in memory.
+
+
+
+##### [Back To Top](#memory-analysis-introduction)
+
+---
+
+### THM MA Intro Practical 
+
+<img src="/imgs/THMMA.png" alt="alt text" width="1300"/>
+
+> **Flag:** THM{m3mory_analyst_g00d_job}
+
+
 ##### [Back To Top](#memory-analysis-introduction)
 
 ---
@@ -204,9 +283,136 @@ This hands-on experience with memory manipulation really reinforces the forensic
 
 ---
 
-### rootkits
+## Rootkits
+
+```js
+Leaked by David, very important!
+
+Very easy and cool concept of malware.
+
+(My guess is that we will be looking for hidden rootkit inside of MBR or VBR)
+```
+
+Rootkits, like the name implies, is from the concept root access in the OS unix, this allows the user broad perms to change files and settings. 
+
+While most roots kits main purpose is to get into most offlitmits parts of the PC, all roots kits serve the same general purpose which is to conceale there own pressence or the pressence of another bit of malware. 
+
+Becaouse there own purpose is to be concelaed, they are often very hard to remove.
+
+
+### How harmful/impressive are rootkits anyways?
+
+
+So how do rootkits hide themselvs? Some, like we mentioned above in DDL Injection, hide themselves in legitimate coppies of programs, some more dangroues forms of rootkits hide themselves as a part of your OS kernal. 
+
+The core part of your OS that allow your programs to communicate with your hardware, through things like device drivers. Meaning, since drivers run in kernal mode [(Ring 0)](#ram-structure) many root kits disguise themselves as drivers. 
+
+```
+Which is why you should only download drivers from trusted sources.
+```
+
+There are other kinds of rootkits that go beyond infecting the OS by tampering with the hard-drive boot sector. The rootkit code would be injected into the bootstrap code section of either:
+```js
+MBR: Bytes 446-509 (64 bytes of executable boot code)
+VBR: Bytes 62-509 (448 bytes of executable boot code)
+```
+
+This is where the actual bootloader instructions live, the part that gets executed when the system starts up. The rootkit overwrites or modifies the executable code to run its payload before the legitimate OS loads, allowing it to load malicious code before the OS and even hook into disk-encryption routines.
+
+The most persistent rootkits can even infect system firmware such as motherboard BIOS/UEFI or GPU BIOS. These firmware-level infections survive even factory resets and OS reinstalls, making them extremely difficult to detect and remove.
+
+### Common rootkit famalies
+
+**Firmware rootkits**
+```
+- BIOS/UEFI Rootkits (Motherboard firmware)
+- GPU BIOS infections
+- hard drive firmware rootkits
+```
+**Bootloader/Bot Sector Rootkits**
+```
+- MBR Rootkits (Master Boot Record)
+- VBR Rootkits (Volume Boot Record)
+- Boot Parition infections
+```
+**kernal-mode rootkits**
+```
+- Driver based rootkist [(Ring 0)](#ram-structure)
+- Kernal Object Manipulation (DKOM)
+- System call hooking
+```
+**Hardware Rootkits**
+```
+- Network card firmware
+- USB device infections
+- PCI device rootkits
+```
+
+### User-mode vs Kernal mode rootkits
+
+##### User-mode
+User-mode rootkits operatite in [(Ring 3)](#ram-structure), the same privilege level as standard applications like web browsers and minecraft, and do not have direct access to kernal memory of hardware. 
+
+They typically use techniques such as [DDL injection](#memory-based-threat-indicators), code injection or Important Address Table (IAT) hooking to intercept and modify API calls, allowing them to hide files, processes or registry entiries from user-level applications. 
+
+Becaouse they run in user space [(Ring 3)](#ram-structure), their impact is generally limitd to individual processes and a crash in a user-mode rootkit usually does no cause a system-wise failure. 
+
+##### Kernal-mode
+Kernal-mode rootkits operate in [(Ring 0)](#ram-structure), the most privileged level where the OS kernal and drivers run, giving the rootkit unrestricted access to system resoruces and hardware. They can modify core kernal data strucutres using techniques like Direct Kernal Object Manipulation (DKOM), hook the System Service Descripter Table (SSDT) or even alter system call tables to subvert OS functionality and hide malicious activity. 
+
+Because they operate at the kernal level, they can compromise the integrity of an entire system, including security tools running in user mode, making detection and removal extermely difficult. 
+
+### Removal challenges & Modern Defenses
+
+Trying to remove something you dont even know you have is very tricky, and large organisations have tried through logging suspiscous  acesses requests through a firewall, dumping everything in memory to look for maliscouse code. But theses are not the things a home user can easily do, although modern motherboards with UEFI have some features to block rootkits, such as secure boot but has issues like not allowing legitimate things like multiple OS boots. 
+
+
+
 
 ##### [Back To Top](#memory-analysis-introduction)
+
+---
+
+## Kernal and why kernal level systems are hated
+
+There are many kernal level systems that automatically get installed with other programs, one example is Valorant. Valorant includes a kernal-level anti-cheat software, others also include one such as CS2, LoL and fortnite. Some of the most popular third party softwares include EasyAntiCheat, PunkBuster, BattleEye, nProtect GameGuard, Xigncode3 and EQU8.
+
+Some devs use proprietary software like Riot's Gangaurd, activions Ricochet, Electronic Art's EA Anticheat or Blizzards Defense matrix.
+
+**So why are they hated?**
+
+Despite its effectiness in detecting cheats, kernal-level anti-cheat software is not without controversy. It can introduce vunarabilities into the system and has been associated with issues such as blue screen errors and system crashes. There are also concerncs about the potentianl misue or mishandling of senstive user information.
+
+This could stem from china/USA based kernal based anti-cheat softwars being use for 'spyware' which is packaged with games. Most users don't like the idea of such a high level overview on their pcs. 
+
+
+##### [Back To Top](#memory-analysis-introduction)
+
+---
+
+### Case 1 - Genshin Impact
+
+Genshin Impact had a kernel-level anti-cheat driver called **mhyprot2.sys**. Due to it being kernel-level, it requires a valid digital signature from Microsoft to run on Windows systems with Driver Signature Enforcement enabled.
+
+The vulnerability arose because the legitimate signed driver contained flaws that could be exploited. Attackers could distribute this driver separately (without the game) and it would run without being flagged because it was already approved and digitally signed under Genshin Impact's anti-cheat system. This allowed malicious actors to gain kernel-level access without needing to bypass Windows security measures.
+
+This is known as a "**Bring Your Own Vulnerable Driver**" (BYOVD) attack, where malicious actors exploit legitimate but vulnerable signed drivers to escalate privileges and perform malicious activities at the kernel level.
+
+
+### Case 2 - NVIDIA Driver (CVE-2021-1056)
+
+NVIDIA's graphics driver contained a critical vulnerability (CVE-2021-1056) in the **nvlddmkm.sys** kernel driver that allowed privilege escalation from user-mode to kernel-mode. The vulnerability was an improper validation of user-supplied data that could lead to memory corruption.
+
+Attackers could exploit this flaw by sending specially crafted requests to the driver, allowing them to execute arbitrary code with kernel privileges. This gave attackers the ability to:
+
+* Disable security software and endpoint detection tools
+* Install persistent malware and rootkits
+* Access sensitive system data and credentials
+* Bypass User Account Control (UAC) restrictions
+
+The vulnerability was actively exploited by multiple ransomware groups including LockBit, Conti, and REvil as part of their attack chains. They used it to escalate privileges and disable security defenses before deploying their ransomware payloads.
+
+What made this particularly dangerous was that the NVIDIA driver is legitimately signed and present on millions of systems worldwide, making it an ideal target for BYOVD attacks. Even after patches were released, many systems remained vulnerable due to delayed updates.
 
 ---
 
