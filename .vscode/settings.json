@@ -1,0 +1,32 @@
+{
+    "folder-path-color.folders": [
+    { "path": "frontend", "symbol": "SR", "tooltip": "Source files" },
+    { "path": "packages/common", "symbol": "T", "tooltip": "Common" },
+    { "path": "Data Science and AI", "symbol": "AI", "tooltip": "Artificial Intelligence", "color": "green" },
+    { "path": "Memory Analysis Introduction", "symbol": "MA", "tooltip": "Memory Analysis", "color": "#800080" },
+    { "path": "CybSec and Ethical Hacking", "symbol": "EH", "tooltip": "Ethical Hacking", "color": "red" },
+    { "path": "Dissertation", "symbol": "D", "tooltip": "Dissertation", "color": "yellow" }
+],
+"folder-color.pathColors": [
+    {
+        "folderPath": "Notes\\Memory Analysis Introduction\\",
+        "color": "foldercolorizer.color_9900ff",
+        "badge": "WS"
+    },
+    {
+        "folderPath": "Notes\\Dissertation\\",
+        "color": "foldercolorizer.color_cccc00",
+        "badge": "IN"
+    },
+    {
+        "folderPath": "Notes\\Data Science and AI\\",
+        "color": "foldercolorizer.color_00cc00",
+        "badge": "🧪"
+    },
+    {
+        "folderPath": "Notes\\CybSec and Ethical Hacking\\",
+        "color": "foldercolorizer.color_cc0000",
+        "badge": "EH"
+    }
+]
+}
