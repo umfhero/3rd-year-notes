@@ -94,8 +94,12 @@ It is divided into two broad areas - **Kernel Space and User Space**
 
 **Within the user processes (Ring 3), memory is typically structured into several regions**
 
-- **Stack** Stores temp data like function arguments and return address. It grows and shrinks as functions are called and returned (e.g. when Minecraft calls a function to place a block, the block coordinates are temporarily stored here)
-- **Heap** Used for dynamic memory allocation during runtime, such as objects and buffers which are created by the programs (e.g. when Raft creates new inventory items or BTD6 spawns new bloons - these objects are allocated in heap memory)
+- **Stack** Stores temporary data such as function arguments, return addresses, and local variables. It grows and shrinks with each function call and return. For example, in Minecraft, when the game engine calls a function to place a block, the temporary data like block coordinates and local variables used in that function are stored on the stack. <br>
+  Stack memory is useful for identifying the flow of execution and spotting function calls or return address tampering (eg stack pivoting in exploits).
+  <br>
+- **Heap** Used for dynamic memory allocation at runtime. Programs use the heap to store objects, buffers, and other large or variable-sized data structures that persist beyond individual function calls. For instance, in Raft or BTD6, when new inventory items or bloons are spawned, the associated objects and data are allocated on the heap. <br>
+  Heap memory often contains artefacts like chat logs, usernames, decoded strings, injected payloads, or leftover fragments from previous objects (heap spray remnants).
+  <br>
 - **Executable (.text)** Stores the actual code or instructions the CPU runs (e.g. the compiled game logic for placing blocks in Minecraft or tower shooting mechanics in BTD6)
 - **Data Sections** Space that is used to store global variables and other data the executable may need (e.g. Minecraft's block types, Raft's item recipes, or BTD6's tower stats - data that persists throughout the program)
 
@@ -425,6 +429,8 @@ So a driver signed by a trusted certificate authority (CA) proves its orgiin and
 
 One idea i have is a 1:1 hash verification system for all kernel drivers sounds robust but is impractical due to the vast number of driver versions, frequent updates, and operational complexity. Instead, Microsoft relies on digital signatures to verify driver origin and integrity, balancing security with flexibility. However, a hybrid approach combining signatures with selective hash whitelisting exists in some Microsoft security systems, especially for high-risk drivers.
 
+##### [Back To Top](#memory-analysis-introduction)
+
 ## Quick Revision notes
 
 ##### Ram/Swap
@@ -442,3 +448,11 @@ CPU Registers
 CPU Cache
 RAM
 HDD/SSDs
+
+##### Stack and Heap
+
+**Stack** is simpler and faster but is a bit more limited. Size is known ahead of time and can exist within one function.
+
+**Heap** is slower and a bit more complex to work with. Size unknown aheead of time or return value isnt limited to one function.
+
+##### [Back To Top](#memory-analysis-introduction)
