@@ -156,7 +156,7 @@ Memory dumps vary in scope and the purpose
 
 **Process Dump** captures the memory of a single running process. Helpful for reverse engineering or isolating malicious behaviour within a specific application.
 
-**PageFile and Swap Analysis** Systems offload some memory content to [disk when RAM is full](#virtual-memory). These can contain fragments of data that were once in RAM, offering additional context.
+**PageFile or Swap Analysis** Systems offload some memory content to [disk when RAM is full](#virtual-memory). These can contain fragments of data that were once in RAM, offering additional context.
 
 In some cases, the systems hibernation file `hiberfil.sys` can also be parsed to extract RAM contents saved when the machine enters hibernation mode. [More info on that](https://diverto.github.io/2019/11/05/Extracting-Passwords-from-hiberfil-and-memdumps)
 
@@ -413,8 +413,32 @@ The vulnerability was actively exploited by multiple ransomware groups including
 
 What made this particularly dangerous was that the NVIDIA driver is legitimately signed and present on millions of systems worldwide, making it an ideal target for BYOVD attacks. Even after patches were released, many systems remained vulnerable due to delayed updates.
 
----
+#### Thoughts
 
-```js
-pwd var
-```
+One thing i was confused by is, why doesnt windows just verify kernal drivers like the mhprot2.sys by a simple hash check? if all it is, is a simple file being modified (normally what you do if you don't think you have the OG file).
+
+One issue is drivers can be legitimatly updated and patched, meaning a small update/patch would trigger the system of a hash check. Kernal drivers and reguarly updated for compatibility, bug fixes and secuirty patches.
+
+So instead of hashes, microsoft primarily relies on digital signatures to validate kernal drivers.
+
+So a driver signed by a trusted certificate authority (CA) proves its orgiin and integrity without needing a fixed hash.
+
+One idea i have is a 1:1 hash verification system for all kernel drivers sounds robust but is impractical due to the vast number of driver versions, frequent updates, and operational complexity. Instead, Microsoft relies on digital signatures to verify driver origin and integrity, balancing security with flexibility. However, a hybrid approach combining signatures with selective hash whitelisting exists in some Microsoft security systems, especially for high-risk drivers.
+
+## Quick Revision notes
+
+##### Ram/Swap
+
+RAM Disappears on shutdown as its volatile, but the swap is on disk, so even after shutdown, you might still find traces of data like passwords, msgs, malware code and session data.
+
+Thats why forensic analysts look at both:
+
+**Ram**: While system is on
+**Swap files**: If system is off (Located at pagefile.sys)
+
+##### Memory hierachy fastest to slowest
+
+CPU Registers
+CPU Cache
+RAM
+HDD/SSDs

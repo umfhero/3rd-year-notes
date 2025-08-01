@@ -1,0 +1,333 @@
+<!DOCTYPE html><html><head>
+      <title>Memory Analysis Introduction</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">
+      
+      
+      
+      
+      
+      <style>
+      code[class*=language-],pre[class*=language-]{color:#333;background:0 0;font-family:Consolas,"Liberation Mono",Menlo,Courier,monospace;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.4;-moz-tab-size:8;-o-tab-size:8;tab-size:8;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:.8em;overflow:auto;border-radius:3px;background:#f5f5f5}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal;background:#f5f5f5}.token.blockquote,.token.comment{color:#969896}.token.cdata{color:#183691}.token.doctype,.token.macro.property,.token.punctuation,.token.variable{color:#333}.token.builtin,.token.important,.token.keyword,.token.operator,.token.rule{color:#a71d5d}.token.attr-value,.token.regex,.token.string,.token.url{color:#183691}.token.atrule,.token.boolean,.token.code,.token.command,.token.constant,.token.entity,.token.number,.token.property,.token.symbol{color:#0086b3}.token.prolog,.token.selector,.token.tag{color:#63a35c}.token.attr-name,.token.class,.token.class-name,.token.function,.token.id,.token.namespace,.token.pseudo-class,.token.pseudo-element,.token.url-reference .token.variable{color:#795da3}.token.entity{cursor:help}.token.title,.token.title .token.punctuation{font-weight:700;color:#1d3e81}.token.list{color:#ed6a43}.token.inserted{background-color:#eaffea;color:#55a532}.token.deleted{background-color:#ffecec;color:#bd2c00}.token.bold{font-weight:700}.token.italic{font-style:italic}.language-json .token.property{color:#183691}.language-markup .token.tag .token.punctuation{color:#333}.language-css .token.function,code.language-css{color:#0086b3}.language-yaml .token.atrule{color:#63a35c}code.language-yaml{color:#183691}.language-ruby .token.function{color:#333}.language-markdown .token.url{color:#795da3}.language-makefile .token.symbol{color:#795da3}.language-makefile .token.variable{color:#183691}.language-makefile .token.builtin{color:#0086b3}.language-bash .token.keyword{color:#0086b3}pre[data-line]{position:relative;padding:1em 0 1em 3em}pre[data-line] .line-highlight-wrapper{position:absolute;top:0;left:0;background-color:transparent;display:block;width:100%}pre[data-line] .line-highlight{position:absolute;left:0;right:0;padding:inherit 0;margin-top:1em;background:hsla(24,20%,50%,.08);background:linear-gradient(to right,hsla(24,20%,50%,.1) 70%,hsla(24,20%,50%,0));pointer-events:none;line-height:inherit;white-space:pre}pre[data-line] .line-highlight:before,pre[data-line] .line-highlight[data-end]:after{content:attr(data-start);position:absolute;top:.4em;left:.6em;min-width:1em;padding:0 .5em;background-color:hsla(24,20%,50%,.4);color:#f4f1ef;font:bold 65%/1.5 sans-serif;text-align:center;vertical-align:.3em;border-radius:999px;text-shadow:none;box-shadow:0 1px #fff}pre[data-line] .line-highlight[data-end]:after{content:attr(data-end);top:auto;bottom:.4em}html body{font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ol,html body>ul{margin-bottom:16px}html body ol,html body ul{padding-left:2em}html body ol.no-list,html body ul.no-list{padding:0;list-style-type:none}html body ol ol,html body ol ul,html body ul ol,html body ul ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;background-color:#f0f0f0;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:700;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:700}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::after,html body code::before{letter-spacing:-.2em;content:'\00a0'}html body pre>code{padding:0;margin:0;word-break:normal;white-space:pre;background:0 0;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:after,html body pre code:before,html body pre tt:after,html body pre tt:before{content:normal}html body blockquote,html body dl,html body ol,html body p,html body pre,html body ul{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body code,html body pre{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview ul{list-style:disc}.markdown-preview ul ul{list-style:circle}.markdown-preview ul ul ul{list-style:square}.markdown-preview ol{list-style:decimal}.markdown-preview ol ol,.markdown-preview ul ol{list-style-type:lower-roman}.markdown-preview ol ol ol,.markdown-preview ol ul ol,.markdown-preview ul ol ol,.markdown-preview ul ul ol{list-style-type:lower-alpha}.markdown-preview .newpage,.markdown-preview .pagebreak{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center!important}.markdown-preview:not([data-for=preview]) .code-chunk .code-chunk-btn-group{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .status{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .output-div{margin-bottom:16px}.markdown-preview .md-toc{padding:0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link div,.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}.markdown-preview .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0;min-height:100vh}@media screen and (min-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px + 2em)}}@media screen and (max-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{font-size:14px!important;padding:1em}}@media print{html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc{padding:0 16px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link div,html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% - 300px);padding:2em calc(50% - 457px - 300px / 2);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+/* Please visit the URL below for more information: */
+/*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+      </style>
+      <!-- The content below will be included at the end of the <head> element. --><script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    // your code here
+  });
+</script></head><body for="html-export">
+    
+    
+      <div class="crossnote markdown-preview  ">
+      
+<h1 id="memory-analysis-introduction">Memory Analysis Introduction </h1>
+<p><a href="../MDX%202025-2025%20Final%20Year.md">← Back to Home Page</a></p>
+<h6 id="this-is-a-wide-array-of-pre-course-notes-i-took-to-prep-for-our-module-please-take-these-with-a-pinch-of-salt-as-these-are-based-on-multiple-sources-some-from-thm-documentation-and-even-personal-experience-please-do-your-own-due-diligence-when-it-comes-to-using-these-notes">This is a wide array of pre-course notes I took to prep for our module, please take these with a pinch of salt as these are based on multiple sources. Some from THM, documentation and even personal experience. Please do your own due diligence when it comes to using these notes. </h6>
+<h5 id="table-of-contents">Table of contents: </h5>
+<ul>
+<li><a href="#volatile-memory">Volatile Memory</a></li>
+<li><a href="#ram-structure">RAM Structure (Rootkits)</a></li>
+<li><a href="#ram-for-forensice-analysts">RAM for Forensic Analysts</a></li>
+<li><a href="#memory-dumps">Memory Dumps</a></li>
+<li><a href="#memory-based-threat-indicators">Memory-based Threat indicators</a></li>
+<li><a href="#memory-manipulation-in-practice">Memory Manipulation in Practice (My hacking using this knowledge)</a></li>
+<li><a href="#rootkits">Rootkits</a></li>
+</ul>
+<h5 id="resources">Resources: </h5>
+<ul>
+<li><a href="https://tryhackme.com/room/memoryanalysisintroduction">THM Link</a></li>
+<li><a href="https://www.fortinet.com/uk/resources/cyberglossary/rootkit">Rootkit</a></li>
+<li><a href="https://www.youtube.com/watch?v=EqGoGwVCVwM">Practial</a></li>
+</ul>
+<h5 id="acronym-dictionary">Acronym dictionary: </h5>
+<ul>
+<li>
+<p>RAM = Random Access Memory</p>
+</li>
+<li>
+<p>FA/DF = Forensic Analysts/Digital Forensics</p>
+</li>
+<li>
+<p>MA/MF = Memory Analysis/Memory Forensics</p>
+</li>
+<li>
+<p>VM = Virtual Memory (Not Volatile memory)</p>
+</li>
+<li>
+<p>OS = Operating System</p>
+</li>
+<li>
+<p>CPU = Central Processing Unit</p>
+</li>
+<li>
+<p>LIFO = Last In, First Out (Stack structure)</p>
+</li>
+<li>
+<p>MMU = Memory Management Unit</p>
+</li>
+<li>
+<p>API = Application Programming Interface</p>
+</li>
+<li>
+<p>DLL = Dynamic Link Library</p>
+</li>
+<li>
+<p>PE = Portable Executable</p>
+</li>
+<li>
+<p>BTD6, Minecraft, Raft are games for any of those unaware (Used as practical examples in memory hacking and manipulation)</p>
+</li>
+</ul>
+<hr>
+<h3 id="brief-run-down">Brief run down: </h3>
+<p>RAM retrieval can be used to learn about threats, user activity and artefacts that are lost after shutdown.</p>
+<p>Volatile memory refers to the stored data that holds system and user level data whilst the computer runs. When the system is <code>powered off or restarted</code>, this data is lost. Although, a common spot for this type of memory to still be available is the <code>RAM (Random Access Memory)</code>.</p>
+<p><code>RAM temporarily stores everything from open files, running processes and encrypted data.</code></p>
+<p>Since this data only exists whilst the system is active, investigators often prioritise capturing RAM as early as possible during an investigation.</p>
+<hr>
+<h3 id="volatile-memory">Volatile Memory </h3>
+<p>PCs store and access info using a hierarchy of memory, each level offering a trade-off between <code>speed and capacity</code>. Starting from the fastest to the slowest the order is:</p>
+<h3 id="cpu-registers--cpu-cache--ram--disk-storage"><code>CPU Registers &gt; CPU Cache &gt; RAM &gt; Disk Storage</code> </h3>
+<p>CPU Registers and Cache are extremely fast but limited in size.</p>
+<p>RAM is the main working memory for the OS and active program (minecraft).</p>
+<p>Disk storage, while much slower is used for more long-term data retention</p>
+<img src="..\imgs\image.png" alt="alt text" width="300">
+<br>
+<br>
+<h3 id="virtual-memory">Virtual Memory </h3>
+<p>The concept of Virtual Memory (VM), on the other hand, is a virtual memory space. When a program runs (like Minecraft), the OS assigns it virtual memory addresses that are mapped to physical RAM or, if needed, to disk-based swap space. Swap is a reserved area on the disk that the OS uses to store data from RAM when physical memory is full temporarily.</p>
+<p>This means that the system can handle more active processes than the RAM alone can support. This allows processes to run as if they have dedicated memory whilst the system manages where the actual data resides. The OS continuously shifts data between RAM and disk depending on the system load and priority.</p>
+<p><strong>Simply, this impacts MA because some forensic artefacts may reside in RAM whilst others may be temporarily stored in the swap files.</strong></p>
+<img src="..\imgs\swap.png" alt="alt text" width="400">
+<h5 id="back-to-topmemory-analysis-introduction"><a href="#memory-analysis-introduction">Back To Top</a> </h5>
+<hr>
+<h3 id="ram-structure">RAM Structure </h3>
+<p>RAM is usually the memory on which investigations will focus on.</p>
+<p>It is divided into two broad areas - <strong>Kernel Space and User Space</strong></p>
+<ul>
+<li><strong>Kernel Space</strong> (<em>Ring 0</em>) is reserved for the OS and low-level services (Where advanced malware like <a href="#rootkits">RootKit</a> operate to gain deeper system access and evade detection)</li>
+<li><strong>User Space</strong> (<em>Ring 3</em>) contains processes launched by the user or applications (like <code>Minecraft, Raft, BTD6</code>), each gets its own separate space, protected from others</li>
+</ul>
+<h2 id="img-srcimgskernalpng-altalt-text-width400-"><img src="..\imgs\kernal.png" alt="alt text" width="400"> </h2>
+<p><strong>Within the user processes (Ring 3), memory is typically structured into several regions</strong></p>
+<ul>
+<li>
+<p><strong>Stack</strong> Stores temp data like function arguments and return address. It grows and shrinks as functions are called and returned (e.g. when Minecraft calls a function to place a block, the block coordinates are temporarily stored here)</p>
+</li>
+<li>
+<p><strong>Heap</strong> Used for dynamic memory allocation during runtime, such as objects and buffers which are created by the programs (e.g. when Raft creates new inventory items or BTD6 spawns new bloons - these objects are allocated in heap memory)</p>
+</li>
+<li>
+<p><strong>Executable (.text)</strong> Stores the actual code or instructions the CPU runs (e.g. the compiled game logic for placing blocks in Minecraft or tower shooting mechanics in BTD6)</p>
+</li>
+<li>
+<p><strong>Data Sections</strong> Space that is used to store global variables and other data the executable may need (e.g. Minecraft's block types, Raft's item recipes, or BTD6's tower stats - data that persists throughout the program)</p>
+<p><strong>It is really important you understand this when it comes to identifying where forensic artifacts might be located. For instance:</strong></p>
+</li>
+</ul>
+<h2 id="img-srcimgs1png-altalt-text-width600-"><img src="..\imgs\1.png" alt="alt text" width="600"> </h2>
+<ul>
+<li><strong>Stack</strong>: Shell commands, function parameters, recently typed passwords, temporary variables</li>
+<li><strong>Heap</strong>: Encryption keys, downloaded files, chat messages, browser history, dynamically allocated buffers</li>
+<li><strong>Data Sections</strong>: Hardcoded passwords, configuration settings, IP addresses, domain names</li>
+<li><strong>Executable</strong>: Malware signatures, embedded payloads, packed/obfuscated code</li>
+</ul>
+<h5 id="back-to-topmemory-analysis-introduction-1"><a href="#memory-analysis-introduction">Back To Top</a> </h5>
+<hr>
+<h3 id="ram-for-forensic-analysts">RAM for Forensic Analysts </h3>
+<p>The analysis of RAM offers a snapshot of what a system is doing at a particular moment, this can include running processes and loaded executables (Apple Music, Minecraft and other apps), open network connections and ports, logged-in users and recent commands, decrypted content including encryption keys and injected code or fileless malware.</p>
+<p>Since all this info disappears once the system is turned off, MA provides a unique chance to observe the system in action. It often reveals evidence not available in disk forensics (FTK, hex editor), especially for attacks that do not write files to disk.</p>
+<p>This makes memory a priority to target during incident response, particularly when dealing with live systems, malware investigations or suspected intrusions.</p>
+<p>MF is often used early in an investigation to capture data that disappears on shutdown. It helps responders collect active processes, network connections and other live artefacts before losing them.</p>
+<p>It is very useful when dealing with in-memory threats, fileless malware or credential theft. MA provides a snapshot of system activity that can help during an investigation.</p>
+<h5 id="back-to-topmemory-analysis-introduction-2"><a href="#memory-analysis-introduction">Back To Top</a> </h5>
+<hr>
+<h2 id="memory-dumps">Memory Dumps </h2>
+<p>A memory dump is a snapshot (version) of a system's RAM at a specific point in time. It captures everything stored in <a href="#volatile-memory">Volatile Memory</a>, including running processes, active sessions, network activity and sometimes even sensitive data like credentials (passwords).</p>
+<p>Memory Dumps are widely used for FA, malware investigations and threat hunting. Security teams (Blue team) analyse these snapshots to understand what was running on a system and to uncover suspicious or unauthorised activity. Tools like <a href="https://www.varonis.com/blog/what-is-mimikatz">Mimikatz</a> are often used by red teamers and attackers to extract credentials directly from memory, making memory dumps an important defensive focus.</p>
+<h4 id="how-memory-dumps-are-created">How Memory Dumps are Created </h4>
+<p>Creating a memory dump depends on the OS in use. The goal is to capture RAM content without significantly altering it during acquisition.</p>
+<p>On <strong>Windows</strong>, tools like built-in crash dumps, Sysinternals' RAMMap or other third party utilities such as WinPmem and FTK Imager can be used to generate full or selective memory captures.</p>
+<p>Some methods include kernel mode dumps located at <code>%SystemRoot%\MEMORY.DMP</code> and hibernation files stored as <code>%SystemDrive%\hiberfil.sys</code>.</p>
+<p>On <strong>Linux</strong> and <strong>MacOS</strong>, analysts can use tools like LiME (Linux Memory Extractor), or dd with access to <code>/dev/mem</code> or <code>/proc/kcore</code>, depending on kernel protections.</p>
+<p><strong>Software we are using on our course is called Volatility (Volatility Framework)</strong></p>
+<p>It is one of the most widely used tools in DF for analysing VM (RAM).</p>
+<h4 id="types-of-memory-dumps">Types of Memory Dumps </h4>
+<p>Memory dumps vary in scope and the purpose</p>
+<p><strong>Full memory dumps</strong> capture all RAM, including user and kernel space (Ring 0-3), useful for complete forensic investigations and malware analysis.</p>
+<p><strong>Process Dump</strong> captures the memory of a single running process. Helpful for reverse engineering or isolating malicious behaviour within a specific application.</p>
+<p><strong>PageFile and Swap Analysis</strong> Systems offload some memory content to <a href="#virtual-memory">disk when RAM is full</a>. These can contain fragments of data that were once in RAM, offering additional context.</p>
+<p>In some cases, the systems hibernation file <code>hiberfil.sys</code> can also be parsed to extract RAM contents saved when the machine enters hibernation mode. <a href="https://diverto.github.io/2019/11/05/Extracting-Passwords-from-hiberfil-and-memdumps">More info on that</a></p>
+<h3 id="challenges-that-can-happen-with-memory-dump-acquisistion">Challenges that can happen with Memory dump acquisistion </h3>
+<p>Due to the fact attacks may know about memory dumps, they may deploy anti-forensic techniques to tamper with memory capture tools or hide their pressence within RAM.</p>
+<p>Examples of this can include:<br>
+<img src="..\imgs\dumpchallenge.png" alt="alt text" width="650"></p>
+<p>These methods require analysts to go beyond the default tools and use memory carving, kernal-level inspection and behaviour-based techniques to uncover hidden acitivty.</p>
+<p>Lastly, there are encryption and obfuscation techniques which also are used to make memory content harder to interpret. Encrypted payloads or compressed code blcoks may be stored in memory and only decrypted at runtime, which adds a level of complexity to the analysis.</p>
+<h5 id="back-to-topmemory-analysis-introduction-3"><a href="#memory-analysis-introduction">Back To Top</a> </h5>
+<hr>
+<h2 id="memory-based-threat-indicators">Memory-based Threat indicators </h2>
+<p>MA is especially powerful for detecting threats that may not leave traces on a disk. While logs and file systems offer long-term evidence, memory reveals what is happening right now, making it an essetional part for identifying active or recently exectued attacks.</p>
+<p>The most common artifcats that analysts look for in memory can include the following:</p>
+<ul>
+<li>Suspicous or malicous processes that are running without a crrosponding file on disk (The Practial in resources has an example of this)</li>
+<li>DDL Injection, which is malicious code that is injected into the memory space of a legitimate process (hidden).</li>
+<li>Process hollowing which is a technique where the memory of a trusted process is replaced with malicious code</li>
+<li>API hooking, used to intercept or alter normal function calls to hide activity or manipuate system behvaior</li>
+<li><a href="#rootkits">RootKits</a>, espically those operating in kernal space, which manipulate memory strucutres to hide files, processes, or network connections</li>
+</ul>
+<p>These techniques can often leave specific memoyr signatures, like unusual memory regions, non-matching PE headers, or code execution in writable memory areas which can be detected with forensic tools.</p>
+<p>Some of the most common attacks that can be found while pefroming a MA:</p>
+<h4 id="credential-access-mitre-attck-t1003">Credential Access (MITRE ATT&amp;CK: T1003) </h4>
+<blockquote>
+<p>T1071 – Application Layer Protocol: Command and Control</p>
+</blockquote>
+<p>Modern malware often communiats with external servers without dropping files (for example spyware). This fileless malware uses memory-resident payloads to fetch commands or exfiltrate data through standard protocols like HTTP, HTTPS or DNS. In memory, analyssts can find decrpted C2 Configs, IP Addresses or becaons that are not logged anywhere else to try find artifacts.</p>
+<h4 id="in-memory-script-execution-t1086">In-Memory Script Execution (T1086) </h4>
+<blockquote>
+<p>T1086 – PowerShell</p>
+</blockquote>
+<p>Scripts exectued from memory are harder to trace becoause they dont touch the disk. Attackers use powershell or other interperts (python, WMI) to execture code in RAM. MA may reveal full script contents, encoded commands, or runtime artifacts in the powershell process memory.</p>
+<h4 id="persistence-techniques-in-memory">Persistence Techniques in Memory </h4>
+<p>These persistence mechanisms can be identified by spotting related artifacts during a live memory analysis:</p>
+<blockquote>
+<p>T1053.005 – Scheduled Task/Job: Scheduled Task</p>
+</blockquote>
+<p>Task schedualr creates jobs that execute at intervals or startup. During a MA, we can look for processes like <strong>schtasks.exe</strong> and memory strings that contain task names or malicious payload paths.</p>
+<blockquote>
+<p>T1543.003 – Create or Modify System Process: Windows Service</p>
+</blockquote>
+<p>Malicious services may run in the background under <strong>services.exe</strong>. We may find unusal servcice names, binaries or configs in memory that can relate to this technique.</p>
+<blockquote>
+<p>T1547.001 – Registry Run Keys / Startup Folder</p>
+</blockquote>
+<p>Malware adds entires <strong>HKCU\Software\Microsoft\Windows\CurrentVersion\Run</strong> to executre on boot. These values can often be recovered from memory or found within registery hives cached in RAM.</p>
+<h3 id="lateral-movement-via-memory-artifacts">Lateral Movement via Memory Artifacts </h3>
+<p>Memory forensics can also expose attempts at lateral movement across systems. Common techniques can include:</p>
+<blockquote>
+<p>T1021.002 – Remote Services: SMB/Windows Admin Shares (PsExec)</p>
+</blockquote>
+<p><strong>PsExec</strong> enables command execution on remote systems. Analysts might find <strong>PsExec-related</strong> services or command-line arguments in memoyr indicating lateral movement.</p>
+<blockquote>
+<p>T1021.006 – Remote Services: Windows Remote Management (WinRM)</p>
+</blockquote>
+<p>WinRM Provides powershell remoting. Look for <strong>wsmprovhost.exe</strong> and memory references to remote session initalization.</p>
+<blockquote>
+<p>T1059.001 – Command and Scripting Interpreter: PowerShell (Remote)</p>
+</blockquote>
+<p>Powershell is commonly used for remote command exection. Analysts can detect base64-encoded or obfuscated commands within memory of the powershell processes.</p>
+<blockquote>
+<p>T1047 – Windows Management Instrumentation (WMI)</p>
+</blockquote>
+<p>WMI commands like wmic process call create may be used to spawn remote processes. Associated command strings or class refrences may be cached in memory.</p>
+<h5 id="back-to-topmemory-analysis-introduction-4"><a href="#memory-analysis-introduction">Back To Top</a> </h5>
+<hr>
+<h3 id="thm-ma-intro-practical">THM MA Intro Practical </h3>
+<img src="..\imgs\THMMA.png" alt="alt text" width="1300">
+<blockquote>
+<p><strong>Flag:</strong> THM{m3mory_analyst_g00d_job}</p>
+</blockquote>
+<h5 id="back-to-topmemory-analysis-introduction-5"><a href="#memory-analysis-introduction">Back To Top</a> </h5>
+<hr>
+<h3 id="memory-manipulation-in-practice">Memory Manipulation in Practice </h3>
+<p>Understanding how memory works in theory is one thing, but seeing it in action really drives the concepts home. Since programs store their data in predictable memory locations, we can actually interact with and modify this data while the program is running.</p>
+<p>As a theoretical exercise to prove my knowledge, here are my following experiments.<br>
+<img src="..\imgs\cheatengine.png" alt="alt text" width="400"></p>
+<p>Because game data is stored in our local RAM at specific addresses, we can actually manipulate these values using tools like Cheat Engine. I've tested this with games like Minecraft, Raft, and BTD6. These values are stored in different variable types depending on how the game implements them.</p>
+<p>For example, values that have stack limits or maximum values (like resources in Raft <code>20</code> and items in Minecraft <code>64</code>) can be found using <strong>Exact Value</strong> searches, which allows for easy modification of that specific memory location.</p>
+<p>There are more complex values, such as money in BTD6, where there's no hard limit and the value is stored as a floating-point number (double). Searching for doubles using the same memory scanning method allows us to modify these values as well.</p>
+<p>Here's that example, this specifically was an abuse of the multiplier on per bloon hit. Normally it is set to something low. But I changed it to the max, meaning that it would exponentially get bigger. This also triggered the rounds to rapidly fluctuate (visually, not actually) to the int limit, then into negatives.<br>
+<img src="..\imgs\BTD6.png" alt="alt text" width="500"></p>
+<p>Another technique is to prevent writes to a memory address entirely. By "freezing" or stopping the write to address functionality, the value becomes read-only from the program's perspective.</p>
+<p>This essentially gives infinite resources since the program can't subtract from that value when items are used, and any new items picked up are effectively voided since the memory location can't be updated.</p>
+<p>This hands-on experience with memory manipulation really reinforces the forensic concepts. It shows how volatile memory contains all the program state data that investigators need to capture and analyse during live system analysis.</p>
+<h5 id="back-to-topmemory-analysis-introduction-6"><a href="#memory-analysis-introduction">Back To Top</a> </h5>
+<hr>
+<h2 id="rootkits">Rootkits </h2>
+<pre data-role="codeBlock" data-info="js" class="language-javascript js"><code><span class="token maybe-class-name">Leaked</span> by <span class="token maybe-class-name">David</span><span class="token punctuation">,</span> very important<span class="token operator">!</span>
+
+<span class="token maybe-class-name">Very</span> easy and cool concept <span class="token keyword keyword-of">of</span> malware<span class="token punctuation">.</span>
+
+<span class="token punctuation">(</span><span class="token maybe-class-name">My</span> guess is that we will be looking <span class="token keyword control-flow keyword-for">for</span> hidden rootkit inside <span class="token keyword keyword-of">of</span> <span class="token constant">MBR</span> or <span class="token constant">VBR</span><span class="token punctuation">)</span>
+</code></pre><p>Rootkits, like the name implies, is from the concept root access in the OS unix, this allows the user broad perms to change files and settings.</p>
+<p>While most roots kits main purpose is to get into most offlitmits parts of the PC, all roots kits serve the same general purpose which is to conceale there own pressence or the pressence of another bit of malware.</p>
+<p>Becaouse there own purpose is to be concelaed, they are often very hard to remove.</p>
+<h3 id="how-harmfulimpressive-are-rootkits-anyways">How harmful/impressive are rootkits anyways? </h3>
+<p>So how do rootkits hide themselvs? Some, like we mentioned above in DDL Injection, hide themselves in legitimate coppies of programs, some more dangroues forms of rootkits hide themselves as a part of your OS kernal.</p>
+<p>The core part of your OS that allow your programs to communicate with your hardware, through things like device drivers. Meaning, since drivers run in kernal mode <a href="#ram-structure">(Ring 0)</a> many root kits disguise themselves as drivers.</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>Which is why you should only download drivers from trusted sources.
+</code></pre><p>There are other kinds of rootkits that go beyond infecting the OS by tampering with the hard-drive boot sector. The rootkit code would be injected into the bootstrap code section of either:</p>
+<pre data-role="codeBlock" data-info="js" class="language-javascript js"><code><span class="token constant">MBR</span><span class="token operator">:</span> <span class="token maybe-class-name">Bytes</span> <span class="token number">446</span><span class="token operator">-</span><span class="token number">509</span> <span class="token punctuation">(</span><span class="token number">64</span> bytes <span class="token keyword keyword-of">of</span> executable boot code<span class="token punctuation">)</span>
+<span class="token constant">VBR</span><span class="token operator">:</span> <span class="token maybe-class-name">Bytes</span> <span class="token number">62</span><span class="token operator">-</span><span class="token number">509</span> <span class="token punctuation">(</span><span class="token number">448</span> bytes <span class="token keyword keyword-of">of</span> executable boot code<span class="token punctuation">)</span>
+</code></pre><p>This is where the actual bootloader instructions live, the part that gets executed when the system starts up. The rootkit overwrites or modifies the executable code to run its payload before the legitimate OS loads, allowing it to load malicious code before the OS and even hook into disk-encryption routines.</p>
+<p>The most persistent rootkits can even infect system firmware such as motherboard BIOS/UEFI or GPU BIOS. These firmware-level infections survive even factory resets and OS reinstalls, making them extremely difficult to detect and remove.</p>
+<h3 id="common-rootkit-famalies">Common rootkit famalies </h3>
+<p><strong>Firmware rootkits</strong></p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>- BIOS/UEFI Rootkits (Motherboard firmware)
+- GPU BIOS infections
+- hard drive firmware rootkits
+</code></pre><p><strong>Bootloader/Bot Sector Rootkits</strong></p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>- MBR Rootkits (Master Boot Record)
+- VBR Rootkits (Volume Boot Record)
+- Boot Parition infections
+</code></pre><p><strong>kernal-mode rootkits</strong></p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>- Driver based rootkist [(Ring 0)](#ram-structure)
+- Kernal Object Manipulation (DKOM)
+- System call hooking
+</code></pre><p><strong>Hardware Rootkits</strong></p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>- Network card firmware
+- USB device infections
+- PCI device rootkits
+</code></pre><h3 id="user-mode-vs-kernal-mode-rootkits">User-mode vs Kernal mode rootkits </h3>
+<h5 id="user-mode">User-mode </h5>
+<p>User-mode rootkits operatite in <a href="#ram-structure">(Ring 3)</a>, the same privilege level as standard applications like web browsers and minecraft, and do not have direct access to kernal memory of hardware.</p>
+<p>They typically use techniques such as <a href="#memory-based-threat-indicators">DDL injection</a>, code injection or Important Address Table (IAT) hooking to intercept and modify API calls, allowing them to hide files, processes or registry entiries from user-level applications.</p>
+<p>Becaouse they run in user space <a href="#ram-structure">(Ring 3)</a>, their impact is generally limitd to individual processes and a crash in a user-mode rootkit usually does no cause a system-wise failure.</p>
+<h5 id="kernal-mode">Kernal-mode </h5>
+<p>Kernal-mode rootkits operate in <a href="#ram-structure">(Ring 0)</a>, the most privileged level where the OS kernal and drivers run, giving the rootkit unrestricted access to system resoruces and hardware. They can modify core kernal data strucutres using techniques like Direct Kernal Object Manipulation (DKOM), hook the System Service Descripter Table (SSDT) or even alter system call tables to subvert OS functionality and hide malicious activity.</p>
+<p>Because they operate at the kernal level, they can compromise the integrity of an entire system, including security tools running in user mode, making detection and removal extermely difficult.</p>
+<h3 id="removal-challenges--modern-defenses">Removal challenges &amp; Modern Defenses </h3>
+<p>Trying to remove something you dont even know you have is very tricky, and large organisations have tried through logging suspiscous acesses requests through a firewall, dumping everything in memory to look for maliscouse code. But theses are not the things a home user can easily do, although modern motherboards with UEFI have some features to block rootkits, such as secure boot but has issues like not allowing legitimate things like multiple OS boots.</p>
+<h5 id="back-to-topmemory-analysis-introduction-7"><a href="#memory-analysis-introduction">Back To Top</a> </h5>
+<hr>
+<h2 id="kernal-and-why-kernal-level-systems-are-hated">Kernal and why kernal level systems are hated </h2>
+<p>There are many kernal level systems that automatically get installed with other programs, one example is Valorant. Valorant includes a kernal-level anti-cheat software, others also include one such as CS2, LoL and fortnite. Some of the most popular third party softwares include EasyAntiCheat, PunkBuster, BattleEye, nProtect GameGuard, Xigncode3 and EQU8.</p>
+<p>Some devs use proprietary software like Riot's Gangaurd, activions Ricochet, Electronic Art's EA Anticheat or Blizzards Defense matrix.</p>
+<p><strong>So why are they hated?</strong></p>
+<p>Despite its effectiness in detecting cheats, kernal-level anti-cheat software is not without controversy. It can introduce vunarabilities into the system and has been associated with issues such as blue screen errors and system crashes. There are also concerncs about the potentianl misue or mishandling of senstive user information.</p>
+<p>This could stem from china/USA based kernal based anti-cheat softwars being use for 'spyware' which is packaged with games. Most users don't like the idea of such a high level overview on their pcs.</p>
+<h5 id="back-to-topmemory-analysis-introduction-8"><a href="#memory-analysis-introduction">Back To Top</a> </h5>
+<hr>
+<h3 id="case-1---genshin-impact">Case 1 - Genshin Impact </h3>
+<p>Genshin Impact had a kernel-level anti-cheat driver called <strong>mhyprot2.sys</strong>. Due to it being kernel-level, it requires a valid digital signature from Microsoft to run on Windows systems with Driver Signature Enforcement enabled.</p>
+<p>The vulnerability arose because the legitimate signed driver contained flaws that could be exploited. Attackers could distribute this driver separately (without the game) and it would run without being flagged because it was already approved and digitally signed under Genshin Impact's anti-cheat system. This allowed malicious actors to gain kernel-level access without needing to bypass Windows security measures.</p>
+<p>This is known as a "<strong>Bring Your Own Vulnerable Driver</strong>" (BYOVD) attack, where malicious actors exploit legitimate but vulnerable signed drivers to escalate privileges and perform malicious activities at the kernel level.</p>
+<h3 id="case-2---nvidia-driver-cve-2021-1056">Case 2 - NVIDIA Driver (CVE-2021-1056) </h3>
+<p>NVIDIA's graphics driver contained a critical vulnerability (CVE-2021-1056) in the <strong>nvlddmkm.sys</strong> kernel driver that allowed privilege escalation from user-mode to kernel-mode. The vulnerability was an improper validation of user-supplied data that could lead to memory corruption.</p>
+<p>Attackers could exploit this flaw by sending specially crafted requests to the driver, allowing them to execute arbitrary code with kernel privileges. This gave attackers the ability to:</p>
+<ul>
+<li>Disable security software and endpoint detection tools</li>
+<li>Install persistent malware and rootkits</li>
+<li>Access sensitive system data and credentials</li>
+<li>Bypass User Account Control (UAC) restrictions</li>
+</ul>
+<p>The vulnerability was actively exploited by multiple ransomware groups including LockBit, Conti, and REvil as part of their attack chains. They used it to escalate privileges and disable security defenses before deploying their ransomware payloads.</p>
+<p>What made this particularly dangerous was that the NVIDIA driver is legitimately signed and present on millions of systems worldwide, making it an ideal target for BYOVD attacks. Even after patches were released, many systems remained vulnerable due to delayed updates.</p>
+<hr>
+<pre data-role="codeBlock" data-info="js" class="language-javascript js"><code>pwd <span class="token keyword keyword-var">var</span>
+</code></pre>
+      </div>
+      
+      
+    
+    
+    
+    
+    
+    
+  
+    </body></html>
