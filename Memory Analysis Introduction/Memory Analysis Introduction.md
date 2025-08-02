@@ -25,17 +25,13 @@
 - RAM = Random Access Memory
 - **FA/DF = Forensic Analysts/Digital Forensics**
 - **MA/MF = Memory Analysis/Memory Forensics**
+- **Vol3 = Volatility 3**
 - VM = Virtual Memory (Not Volatile memory)
 - OS = Operating System
-- CPU = Central Processing Unit
-- LIFO = Last In, First Out (Stack structure)
-- MMU = Memory Management Unit
 - API = Application Programming Interface
-- DLL = Dynamic Link Library
-- PE = Portable Executable
 - **THM = TryHackMe**
 
-- BTD6, Minecraft, Raft are games for any of those unaware (Used as practical examples in memory hacking and manipulation)
+> BTD6, Minecraft, Raft are games for any of those unaware (Used as practical examples in memory hacking and manipulation)
 
 ---
 
