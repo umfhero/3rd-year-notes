@@ -96,10 +96,38 @@ It is divided into two broad areas - **Kernel Space and User Space**
 
 - **Stack** Stores temporary data such as function arguments, return addresses, and local variables. It grows and shrinks with each function call and return. For example, in Minecraft, when the game engine calls a function to place a block, the temporary data like block coordinates and local variables used in that function are stored on the stack. <br>
   Stack memory is useful for identifying the flow of execution and spotting function calls or return address tampering (eg stack pivoting in exploits).
+
   <br>
+
 - **Heap** Used for dynamic memory allocation at runtime. Programs use the heap to store objects, buffers, and other large or variable-sized data structures that persist beyond individual function calls. For instance, in Raft or BTD6, when new inventory items or bloons are spawned, the associated objects and data are allocated on the heap. <br>
   Heap memory often contains artefacts like chat logs, usernames, decoded strings, injected payloads, or leftover fragments from previous objects (heap spray remnants).
-  <br>
+
+---
+
+#### In simple terms:
+
+**Stack** = To-do list: you write a task (function call), complete it, then erase it.
+
+**Heap** = Filing cabinet: you store a folder (object), and it stays there until you throw it out.
+
+(**Volatile**)**Stack** purpose is temporary data per function, it stores functions args, local cars and return addresses. It has a short lifetime (lasts only while function runs).
+
+Example is block posistion during placement, when placing the function needs to placeblock
+
+```c
+void placeBlock(int x, int y, int z) {
+    // Block placing logic
+}
+```
+
+So when the funciton calls the values x y z (block coords), they are pushed to the stack, once the funciton is done (block placed), this memory is freed immediately ready to hold the next stack (place block location). This is used for short-term, function specific info.
+
+(**Persistent**) **Heap** purpose is to be long-term data at runtime, it stores objects, buffers or even game entities. The lifetime is long and can exist for the whole program. One example is inventory item data.
+
+One example could be a block being placed but it is a chest (which stores items), and so aslong as it doesnt break, it would need to stay in memory, the program would need to allocate this block object to the heap.
+
+---
+
 - **Executable (.text)** Stores the actual code or instructions the CPU runs (e.g. the compiled game logic for placing blocks in Minecraft or tower shooting mechanics in BTD6)
 - **Data Sections** Space that is used to store global variables and other data the executable may need (e.g. Minecraft's block types, Raft's item recipes, or BTD6's tower stats - data that persists throughout the program)
 
