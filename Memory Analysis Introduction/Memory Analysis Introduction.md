@@ -479,8 +479,37 @@ HDD/SSDs
 
 ##### Stack and Heap
 
-**Stack** is simpler and faster but is a bit more limited. Size is known ahead of time and can exist within one function.
+### **Stack Memory**
 
-**Heap** is slower and a bit more complex to work with. Size unknown aheead of time or return value isnt limited to one function.
+**Characteristics:** Simpler and faster but more limited. Size is known ahead of time and can exist within one function.
+
+**Stack Artifacts:**
+
+- [ ] Function parameters - arguments passed to functions
+- [ ] Return addresses - where the program should jump back to after a function completes
+- [ ] Local variables - temporary variables used within functions
+- [ ] Shell commands - recently executed command line inputs
+- [ ] Recently typed passwords - especially if they were processed by authentication functions
+- [ ] Function call history - sequence of function calls (call stack)
+- [ ] Temporary encryption keys - keys used briefly during cryptographic operations
+- [ ] User input data - keyboard input being processed by input functions
+- [ ] File paths - temporary path strings being processed
+- [ ] Network connection parameters - IP addresses, ports passed to network functions
+
+### **Heap Memory**
+
+**Characteristics:** Slower and more complex to work with. Size unknown ahead of time or return value isn't limited to one function.
+
+**Heap Artifacts:**
+
+- [ ] Chat logs and messages
+- [ ] Usernames and credentials
+- [ ] Decoded/decrypted strings
+- [ ] Injected malicious payloads
+- [ ] Browser history fragments
+- [ ] Downloaded file remnants
+
+**DLL Injection** = adds malicious code to a legitimate process (partial injection)
+**Process Hollowing** = replaces the entire legitimate process content with malware (complete replacement)
 
 ##### [Back To Top](#memory-analysis-introduction)
