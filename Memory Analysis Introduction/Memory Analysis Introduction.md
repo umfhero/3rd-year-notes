@@ -23,8 +23,8 @@
 ##### Acronym dictionary:
 
 - RAM = Random Access Memory
-- FA/DF = Forensic Analysts/Digital Forensics
-- MA/MF = Memory Analysis/Memory Forensics
+- **FA/DF = Forensic Analysts/Digital Forensics**
+- **MA/MF = Memory Analysis/Memory Forensics**
 - VM = Virtual Memory (Not Volatile memory)
 - OS = Operating System
 - CPU = Central Processing Unit
@@ -33,6 +33,7 @@
 - API = Application Programming Interface
 - DLL = Dynamic Link Library
 - PE = Portable Executable
+- **THM = TryHackMe**
 
 - BTD6, Minecraft, Raft are games for any of those unaware (Used as practical examples in memory hacking and manipulation)
 
@@ -459,7 +460,207 @@ One idea i have is a 1:1 hash verification system for all kernel drivers sounds 
 
 ##### [Back To Top](#memory-analysis-introduction)
 
-## Quick Revision notes
+---
+
+# Volatility Essentials
+
+[THM box Back To Top](https://tryhackme.com/room/volatilityessentials)
+
+[Github repo](https://github.com/volatilityfoundation/volatility3)
+
+Need python 3.6 or later to run.
+<br>
+
+Going to be using and writing my revison notes for **Volatility 3** (latest version). It is made up of several key layers:
+
+**Memory Layers**: These layers represent the hierarchy of address spaces, from raw memory to virtual address translations.
+**Symbol tables**: The tables enbale kernal and process structures to be interpreted through OS-Specific debuggin symbols.
+**Plugins**: These are modular routines that leverage the underlyinbg memory layers and symbol tables to extract artefacts of forensic interest.
+
+Installing Volatility directly by cloning from the repo:
+
+```shell
+ubuntu@tryhackme:~/Desktop$ git clone https://github.com/volatilityfoundation/volatility3.git
+ubuntu@tryhackme:~/Desktop$ cd volatility3
+ubuntu@tryhackme:~/Desktop/volatility3$ python3 vol.py -h
+Volatility 3 Framework 2.26.2
+usage: vol.py [-h] [-c CONFIG] [--parallelism [{processes,threads,off}]] [-e EXTEND] [-p PLUGIN_DIRS] [-s SYMBOL_DIRS] [-v] [-l LOG] [-o OUTPUT_DIR] [-q]
+              [-r RENDERER] [-f FILE] [--write-config] [--save-config SAVE_CONFIG] [--clear-cache] [--cache-path CACHE_PATH] [--offline | -u URL]
+              [--filters FILTERS] [--hide-columns [HIDE_COLUMNS ...]] [--single-location SINGLE_LOCATION] [--stackers [STACKERS ...]]
+              [--single-swap-locations [SINGLE_SWAP_LOCATIONS ...]]
+              PLUGIN ...
+
+An open-source memory forensics framework
+
+options:
+  -h, --help            Show this help message and exit, for specific plugin options use 'vol.py  --help'
+  -c CONFIG, --config CONFIG
+                        Load the configuration from a json file
+------TRUNCATED--------
+
+```
+
+#### Memory Acquisition Methodologies
+
+Memory acquistion is a foundation step in forensics that must be performed in a manner that ensures we maintain the integrity of evidence. The process and the deployment envrioment used very from one OS to another.
+
+> David leaked that we will be using linux commands (may just be to navigate the commands etc, but could hint that we may be looking at a Linux OS system not just windows so).
+
+##### For **windows systems**, the following tools can be used to conduct memory acquistion:
+
+- **DumpIt** which captures a full physcial memory image on a 32/64 bit windows and automatically hashes theo utput
+
+- **WinPmem** which is a open source driver based tool that acquires RAM in RAW/ELF formats and embeds acquistion metadata for chain of custody
+
+- **Magnet RAM** Capture which is a GUI driven collector that snapshots volatile memory on live windows hosts while minimising footprint
+
+- **FTK Imager** which is the most common commercial tool that acquires memory and selected logical artefacts alongside disk imaging functions
+
+##### For linux and macOS systems, we can employ the services of the following tools:
+
+- AVML which is a lightweight Microsoft CLI utility that dumps linux memory to a compresses ELF file without requiring a kernal module.
+
+- LiME is a loadable kernal module for Linux that captures full volatile memory over a disk or network and supports ARM/x86 architectures.
+
+- OSXPmem is a macOS specific fork of Pmem that creats raw memory images on Intel-Based Macs for subsequent volatility analysis.
+
+**ELF format?**
+
+---
+
+_For any of those who are unaware, Mac used to buy intel CPUs instead of manufactoring there own as it was cheaper for the short term and just practically, Intel had better chips and for Apple to start trying to make them that early in the game wasnt feasible. Only in 2020 did they announce the plan to shift to custom designed ARM based chips that Apple reffered to as Apple silicon._
+
+_This is one of the issues i had when it came to getting Virtual Machines (VMs) running on peoples Macs as the silicon CPUs have a completly different architecture than the intel CPUs and there for the setup was unknown/impossible for awhile and few tutorials online actaully work._
+
+**This means, looking at the Mac age/version is important as the differnece between a pre/post silicon change can mean a compeltly differnt strategy when it comes to some tools/setups.**
+
+---
+
+Extracting memory from virtual envrioments can be done by collecting the virtual memory file from the host machines drive. Depending on the hypervisor in use, the output file will likely differ and you would likely encounter the following examples:
+
+- **VMware** - .vmem
+- **Hyper-V**- .bin
+- **Parallels** - .mem
+- **VirtualBox** - .sav It is worth noting that this is a partial memory file.
+
+> Not sure what VM David will go with, but it will most liekly be VirtualBox, which is the one you have if you followed the CyberSec Society tutorials.
+
+##### Memory Analysis
+
+To have a holistic and hands on understanding of Volatility, we shall investigate a forensic case and use it to learn about the tools inner workings (**THM linked above)**. The file for analysis are found under the Desktop/Investigations directory.
+
+##### Case 001
+
+Your SOC has informed you that they have gathered a memory dump from a quarntined endpoint throught to have been compromised by a banking trojan masquerading as an Adobe document. Your job is to use your knowledge of threat intelligence and reverse engineering to perform memory forensics on the infected host.
+
+You have ben infomred of a sus IP in a connection with the file Investigation-1.vmem that could be helpful (41.168.5.140)
+
+**Plugins**
+
+Volatility uses plugins to request data to carry out analysis. Some of the most commonly used plugins include:
+
+```
+windows.info
+linux.info
+pslist
+pstree
+```
+
+Let us look at these plugins, extracting information from our memory file. First, we can begin obtaining operating system detials from the image. In previous versions of Volatility, this information was identified as OS profiles and was extracted using the plugin imageinfo. However, OS proifles have been deprecated in the new version, and now we have the individual information plugins.
+
+Given that our memory file was obtained from a Windows VM running VMware (vmem) we can extract details about its profile with the command below:
+
+```shell
+~/Desktop/volatility3$ python3 vol.py -f ~/Desktop/Investigations/Investigation-1.vmem windows.info
+
+Volatility 3 Framework 2.26.2
+WARNING  volatility3.framework.layers.vmware: No metadata file found alongside VMEM file. A VMSS or VMSN file may be required to correctly process a VMEM file. These should be placed in the same directory with the same file name, e.g. Investigation-1.vmem and Investigation-1.vmss.
+Progress:  100.00               PDB scanning finished
+Variable        Value
+
+Kernel Base     0x804d7000
+DTB     0x2fe000
+Symbols file:///home/ubuntu/Desktop/volatility3/volatility3/symbols/windows/ntkrnlpa.pdb/30B5FB31AE7E4ACAABA750AA241FF331-1.json.xz
+```
+
+![alt text](image-2.png)
+
+We can extract the system version, architecture, symbol tables, and avaible memory layers from the details.
+
+![alt text](image.png)
+![alt text](image-1.png)
+
+---
+
+### Listing Processes and Connections
+
+When we want to analyse details on processes and network connections from our memory file, Volatility supports different plugins, each with varying techniques used. Not all plugins mentioned here will produce a result from the memory file, as the capture may not have included processes or services that the plugins would enumerate.
+
+##### Active Process Enumeration
+
+The most basic way of listing processes is by using `pslist`. The plugin enumerats active processes from the doubly-linked list that keeps track of processes in memory, equivalent to the process list in the task manager. The output from this plugin will include all current and terminated processes and their exit times.
+
+```shell
+python3 vol.py -f ~/Desktop/Investigations/Investigation-1.vmem windows.pslist
+```
+
+##### Hidden Process Enumeration
+
+Some malware, typically [rootKit](#rootkits) will in an attempt to hide their processes, unlik themselves from the list. By unliking themselves from the list, you will no longer see their processes when using `pslist`. To combat this evasion technique, we can use `psscan`. This technique of listing processes will locate processes by finding data structures that match `_EPROCESS`. While this technique can help with evasion countermeasures, it can also result in false positives, therefore we must be careful.
+
+```shell
+python3 vol.py -f ~/Desktop/Investigations/Investigation-1.vmem windows.psscan
+```
+
+##### Process Hierarchy Enumeration
+
+The third process plugin, `pstree`, does not offer any other kind of special technies to help idenitfy evasion like the last two plugins. However, this plugin will list all processes based on their parent process ID, using the same methods as `pslist`. This can be useful for an analyst to get a complete story of the processes and what may have occurred at the extraction time.
+
+```shell
+python3 vol.py -f ~/Desktop/Investigations/Investigation-1.vmem windows.pstree
+```
+
+##### File, Registry, and Thread Enumeration
+
+Inspecting files and registry is also vital during a memory forensic investigation. We can use the plguin `handles` to look into the details and handles of files and threads from a host.
+
+```shell
+python3 vol.py -f ~/Desktop/Investigations/Investigation-1.vmem windows.handles
+```
+
+---
+
+##### Network Connection Enumeration
+
+Now that we know how to identify processes, we also need to have way to identify the network connections present at the time of extraction on the host machine. The `netstat` will attempt to identify all memory structures with a network connection.
+
+```shell
+python3 vol.py -f ~/Desktop/Investigations/Investigation-1.vmem windows.netstat
+```
+
+It is worth noting that this command in the current state of Volatility 3 can be very unstable, particularly around old Windows builds. To combat this, you can utilise other tools like [Bulk-extractor](https://www.kali.org/tools/bulk-extractor/) to extract a PCAP file from the memory file. Sometimes, this is preferred in network connections that you cannot idenitfy from Volatility alone.
+
+##### TCP/UDP Socket Enumeration
+
+We can also identify network sockets and their linked processes from a memory file. To do this, we can use the plugin `netscan`. This will recover active and closed TCP/UDP connections, associated process IDs, local and remote ports, and IPs using memory pool scanning.
+
+```shell
+python3 vol.py -f ~/Desktop/Investigations/Investigation-1.vmem windows.netscan
+```
+
+##### DLL Enumeration
+
+The last plugin is `dlllist` this plugin will list all DDLs associated with processes at extraction time. This can especially be useful once you have analysed further and filitered the output to a specific DLL that might indicate a specfiic type of malware you belive to be on the system.
+
+```shell
+python3 vol.py -f ~/Desktop/Investigations/Investigation-1.vmem windows.dlllist
+```
+
+##### [Back To Top](#memory-analysis-introduction)
+
+---
+
+## Lacking Revision notes
 
 ##### Ram/Swap
 
