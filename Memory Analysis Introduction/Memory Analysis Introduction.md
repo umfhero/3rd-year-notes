@@ -7,16 +7,22 @@
 ##### Table of contents:
 
 - [Volatile Memory](#volatile-memory)
-- [RAM Structure (Rootkits)](#ram-structure)
-- [RAM for Forensic Analysts](#ram-for-forensice-analysts)
+- [RAM Structure](#ram-structure)
+- [RAM for Forensic Analysts](#ram-for-forensic-analysts)
 - [Memory Dumps](#memory-dumps)
-- [Memory-based Threat indicators](#memory-based-threat-indicators)
-- [Memory Manipulation in Practice (My hacking using this knowledge)](#memory-manipulation-in-practice)
+- [Memory-based Threat Indicators](#memory-based-threat-indicators)
+- [Memory Manipulation in Practice](#memory-manipulation-in-practice)
 - [Rootkits](#rootkits)
+- [Kernel and Why Kernel Level Systems are Hated](#kernal-and-why-kernal-level-systems-are-hated)
+- [Case Studies](#case-1---genshin-impact) (Rookit stuff - Genshin/Nvida)
+- [Volatility Essentials](#volatility-essentials)
+- [Quick Revision Notes](#lacking-revision-notes) (Re-Revision/Important things/re-explained stuff)
 
 ##### Resources:
 
-- [THM Link](https://tryhackme.com/room/memoryanalysisintroduction)
+- [THM MA Intro Link](https://tryhackme.com/room/memoryanalysisintroduction)
+- [THM Vol3](https://tryhackme.com/room/volatilityessentials)
+- [Github repo Vol3](https://github.com/volatilityfoundation/volatility3)
 - [Rootkit](https://www.fortinet.com/uk/resources/cyberglossary/rootkit)
 - [Practial](https://www.youtube.com/watch?v=EqGoGwVCVwM)
 
