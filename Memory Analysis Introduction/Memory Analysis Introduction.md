@@ -658,6 +658,84 @@ The last plugin is `dlllist` this plugin will list all DDLs associated with proc
 python3 vol.py -f ~/Desktop/Investigations/Investigation-1.vmem windows.dlllist
 ```
 
+---
+
+### Examples:
+
+###### [Grep Flags](https://zwischenzugs.com/2022/02/02/grep-flags-the-good-stuff/)
+
+##### Finding Adobe Process Path
+
+```shell
+python3 vol.py -f ~/Desktop/Investigations/Investigation-1.vmem windows.pstree | grep -i adobe
+```
+
+**Command Parts:**
+
+- `windows.pstree` - Shows process hierarchy with full paths
+- `grep -i adobe` - Filters for Adobe processes
+  - `-i` = **case-insensitive** (matches "Adobe", "ADOBE", "adobe")
+  - Use when you're not sure about exact capitalization
+
+**Result:** Shows Adobe Reader process with PID 1640, PPID 1484, and path: `C:\Program Files\Adobe\Reader 9.0\Reader\Reader_sl.exe`
+
+##### Finding Parent Process
+
+```shell
+python3 vol.py -f ~/Desktop/Investigations/Investigation-1.vmem windows.pslist | grep -E "(PID|explorer)"
+```
+
+**Command Parts:**
+
+- `windows.pslist` - Lists all processes with detailed info
+- `grep -E "(PID|explorer)"` - Shows header line + explorer process
+  - `-E` = **extended regex** (allows advanced patterns like `|` for OR)
+  - `(PID|explorer)` = matches lines containing either "PID" OR "explorer"
+  - Use when you need multiple search terms or regex patterns
+
+**Key Concept:** Child Process PPID = Parent Process PID
+
+- Adobe Reader (PID 1640) has PPID 1484
+- Explorer.exe has PID 1484
+- Therefore: explorer.exe is the parent of Adobe Reader
+
+**Result:** Parent process is `explorer.exe` (typical when user double-clicks a file)
+
+##### Finding DLLs Outside System32 for Adobe Process
+
+```shell
+python3 vol.py -f ~/Desktop/Investigations/Investigation-1.vmem windows.dlllist --pid 1640 | grep -v -i system32 | grep -c "\.dll"
+```
+
+**Command Parts:**
+
+- `windows.dlllist --pid 1640` - Lists all DLLs for Adobe Reader process (PID 1640)
+- `grep -v -i system32` - Excludes lines containing "system32"
+  - `-v` = **invert match** (show lines that DON'T match the pattern)
+  - `-i` = **case-insensitive** (matches "System32", "SYSTEM32", "system32")
+- `grep -c "\.dll"` - Counts lines containing ".dll"
+  - `-c` = **count** (returns number of matching lines instead of the lines themselves)
+  - `\.dll` = matches literal ".dll" (backslash escapes the dot)
+
+**Key Concept:**
+
+- System32 DLLs are standard Windows libraries (ntdll.dll, kernel32.dll, etc.)
+- Non-system32 DLLs may indicate application-specific libraries or potentially suspicious injected code
+- Counting them helps identify processes with unusual DLL loading patterns
+
+**Result:** Shows count of DLLs loaded by Adobe Reader that are outside the system32 directory
+
+**Case 001 Result:** Running this command shows that Adobe Reader loads **3** DLL files from outside the system32 directory.
+
+```
+ubuntu@tryhackme:~/Desktop/volatility3$ python3 vol.py -f ~/Desktop/Investigations/Investigation-1.vmem windows.dlllist --pid 1640 | grep -v -i system32 | grep -c "\.dll"
+WARNING  volatility3.framework.layers.vmware: No metadata file found alongside VMEM file. A VMSS or VMSN file may be required to correctly process a VMEM file. These should be placed in the same directory with the same file name, e.g. Investigation-1.vmem and Investigation-1.vmss.
+Progress:  100.00		PDB scanning finished
+3
+```
+
+**Forensic Significance:** This count (3) indicates a relatively normal DLL loading pattern for Adobe Reader, as most of its dependencies are standard Windows system libraries located in system32.
+
 ##### [Back To Top](#memory-analysis-introduction)
 
 ---
